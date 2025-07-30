@@ -39,13 +39,27 @@ def calculate_gzd(lat, lon):
     return f"{zone_number:02d}{band_letter}"
 
 def calculate_mgrs(lat, lon, precision=1):
-    pt = gpd.GeoSeries([Point(lon, lat)], crs='EPSG:4326').to_crs(CUSTOM_CRS).iloc[0]
-    x, y = pt.x, pt.y
-    dx = int((x - 500000) // 100_000)
-    dy = int((y - 0) // 100_000)
-    zone = encode_zone(dx, dy)
-    subgrid = encode_subgrid(x - dx * 100_000, y - dy * 100_000, precision)
     gzd = calculate_gzd(lat, lon)
+
+    # Step 1: Extract zone number from GZD
+    zone_number = int(gzd[:2])
+    central_meridian = DATUM_LON + (zone_number - 31) * 6  # same logic used in calculate_gzd
+
+    # Step 2: Build local CRS for this GZD
+    local_crs = f"+proj=tmerc +lat_0=0 +lon_0={central_meridian} +k=0.9996 +x_0=500000 +y_0=0 +ellps=WGS84 +units=m +no_defs"
+
+    # Step 3: Project lat/lon to meters using this zone's CRS
+    pt = gpd.GeoSeries([Point(lon, lat)], crs='EPSG:4326').to_crs(local_crs).iloc[0]
+    x, y = pt.x, pt.y
+
+    # Step 4: Derive 100km square offset
+    dx = int(x // 100_000)
+    dy = int(y // 100_000)
+    zone = encode_zone(dx, dy)
+
+    # Step 5: Subgrid
+    subgrid = encode_subgrid(x - dx * 100_000, y - dy * 100_000, precision)
+
     return f"{gzd} {zone} {subgrid}"
 
 def load_geojson(path):
