@@ -1,0 +1,9 @@
+{
+"type": "FeatureCollection",
+"name": "wildemount_nightguard_pois",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "id": null, "Name": "EP Bramble", "Operation": "Iron Hearth" }, "geometry": { "type": "Point", "coordinates": [ 21.395181303522886, 8.87944294855706 ] } },
+{ "type": "Feature", "properties": { "id": null, "Name": "EP Bramble", "Operation": "Black Iris" }, "geometry": { "type": "Point", "coordinates": [ 15.511034384925352, 1.547814893457756 ] } }
+]
+}
